@@ -981,9 +981,17 @@ public interface DiskEntry extends RegionEntry {
           //disk access exception.
           
           //entry.setValueWithContext(region, newValue); // OFFHEAP newValue already prepared
+          
+          if(did != null && did.isPendingAsync()) {
+            //if the entry was not yet written to disk, we didn't update
+            //the bytes on disk.
+            oldValueLength = 0;
+          } else {
+            oldValueLength = getValueLength(did);
+          }
+          
           if (dr.isBackup()) {
             dr.testIsRecoveredAndClear(did); // fixes bug 41409
-            oldValueLength = getValueLength(did);
             if (dr.isSync()) {
               //In case of compression the value is being set first 
               // because atleast for now , GemFireXD does not support compression
@@ -1588,6 +1596,7 @@ public interface DiskEntry extends RegionEntry {
             try {
               if (Token.isRemovedFromDisk(entryVal)) {
                 // onDisk was already deced so just do the valueLength here
+                dr.incNumOverflowBytesOnDisk(-did.getValueLength());
                 incrementBucketStats(region, 0/*InVM*/, 0/*OnDisk*/,
                                      -did.getValueLength());
                 dr.remove(region, entry, true, false);
@@ -1618,6 +1627,7 @@ public interface DiskEntry extends RegionEntry {
                 region.updateSizeOnEvict(entry.getKey(), entryValSize);
                 // note the old size was already accounted for
                 // onDisk was already inced so just do the valueLength here
+                dr.incNumOverflowBytesOnDisk(did.getValueLength());
                 incrementBucketStats(region, 0/*InVM*/, 0/*OnDisk*/,
                                      did.getValueLength());
                 try {
@@ -1699,6 +1709,7 @@ public interface DiskEntry extends RegionEntry {
               if (Token.isRemovedFromDisk(entryVal)) {
                 if (region.isThisRegionBeingClosedOrDestroyed()) return;
                 // onDisk was already deced so just do the valueLength here
+                dr.incNumOverflowBytesOnDisk(-did.getValueLength());
                 incrementBucketStats(region, 0/*InVM*/, 0/*OnDisk*/,
                                      -did.getValueLength());
                 dr.remove(region, entry, true, false);
@@ -1737,6 +1748,7 @@ public interface DiskEntry extends RegionEntry {
                 region.updateSizeOnEvict(entry.getKey(), entryValSize);
                 // note the old size was already accounted for
                 // onDisk was already inced so just do the valueLength here
+                dr.incNumOverflowBytesOnDisk(did.getValueLength());
                 incrementBucketStats(region, 0/*InVM*/, 0/*OnDisk*/,
                                      did.getValueLength());
                 try {
