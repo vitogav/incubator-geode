@@ -16,7 +16,9 @@ import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.ConfigurationFactory;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.RestoreSystemProperties;
 import org.junit.experimental.categories.Category;
 
 import com.gemstone.gemfire.internal.logging.LogService;
@@ -35,14 +37,11 @@ public class FastLoggerJUnitTest {
   
   private File configFile;
   
-  @Before
-  public void setUp() {
-    System.clearProperty(ConfigurationFactory.CONFIGURATION_FILE_PROPERTY);
-  }
+  @Rule
+  public RestoreSystemProperties restoreSystemProperties = new RestoreSystemProperties();
   
   @After
   public void tearDown() {
-    System.clearProperty(ConfigurationFactory.CONFIGURATION_FILE_PROPERTY);
     LogService.reconfigure();
     if (this.configFile != null && this.configFile.exists()) {
       this.configFile.delete();
