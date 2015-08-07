@@ -62,7 +62,6 @@ dependencies {
   compile 'org.apache.hbase:hbase:0.94.27'
   provided 'commons-lang:commons-lang:2.5'
   provided 'com.google.guava:guava:11.0.2'
-  compile 'io.netty:netty-all:4.0.4.Final'
 
   testRuntime 'org.apache.hadoop:hadoop-auth:2.4.1'
   testRuntime 'commons-collections:commons-collections:3.2.1'
@@ -73,11 +72,11 @@ dependencies {
   compile project(':gemfire-jgroups')
   compile project(':gemfire-joptsimple')
   compile project(':gemfire-json')
+  // compile project(':gemfire-redis-adapter')
   
   testCompile 'org.apache.bcel:bcel:5.2'
   testRuntime 'org.apache.derby:derby:10.2.2.0'
   testCompile 'net.spy:spymemcached:2.9.0'
-  testCompile 'redis.clients:jedis:2.7.2'
 
   jcaCompile sourceSets.main.output
 
